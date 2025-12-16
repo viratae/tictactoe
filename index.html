@@ -5,9 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
+
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+>
+
 </head>
 <body>
-    
+    <h1>Let's Play</h1>
+    <h2><span class="red">Tic</span> <span class="white">Tac</span> <span class="blue">Toe</span></h2>
+    <div id="turnContainer">
+        <div id="turn">
+            <h3>Turn: <span class="bold" id="playerTurn">X</span></h3>
+        </div>
+    </div>
+    <h2 id="resultText"></h2>
+    <div class="gameBoard">
+        <div class="buttonRow">
+            <button class="gameButton" data-row="0" data-col="0"></button>
+            <button class="gameButton" data-row="0" data-col="1"></button>
+            <button class="gameButton" data-row="0" data-col="2"></button>
+        </div>
+        <div class="buttonRow">
+            <button class="gameButton" data-row="1" data-col="0"></button>
+            <button class="gameButton" data-row="1" data-col="1"></button>
+            <button class="gameButton" data-row="1" data-col="2"></button>
+        </div>
+        <div class="buttonRow">
+            <button class="gameButton" data-row="2" data-col="0"></button>
+            <button class="gameButton" data-row="2" data-col="1"></button>
+            <button class="gameButton" data-row="2" data-col="2"></button>
+        </div>
+    </div>
+    <div id="resetButtonContainer">
+        <button id="resetButton">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
