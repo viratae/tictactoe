@@ -1,6 +1,7 @@
 //Variables
 gameButtons = document.querySelectorAll(".gameButton");
-
+let player1 = "X";
+let player2 = "O";
 //Factory function that creates a new gameboard
 function gameboard() {
     let turnIndex = 0;
@@ -92,6 +93,26 @@ function gameboard() {
 }
 function GameController() {
     const board = gameboard();
+    
+    //---Forms---
+   
+    playerNameForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const playerForm = document.querySelector("playerNameForm");
+        const player1Name = document.querySelector("#player1Name").value;
+        const player2Name = document.querySelector("#player2Name").value;
+
+        player1 = player1Name;
+        player2 = player2Name;
+        console.log(player1);
+        screen.render();
+    })
+    function getPlayer1() {
+        return player1;
+    }
+    function getPlayer2() {
+        return player2;
+    }
 
     let turnIndex = 0;
     //---Private Method---
@@ -114,12 +135,16 @@ function GameController() {
         board.reset();
         turnIndex = 0;
     }
+    function getTurnIndex() {
+        return turnIndex;
+    }
     return {
-        board, playTurn, resetGame
+        board, playTurn, resetGame, getPlayer1, getPlayer2, getTurnIndex
     };
 }
 function ScreenController() {
     resultText = document.querySelector("#resultText");
+    playerTurn = document.querySelector("#playerTurn");
     gameButtons.forEach(button => {
         button.addEventListener("click", handleClick);
     })
@@ -142,13 +167,21 @@ function ScreenController() {
             }
         });
         if(game.board.checkWins() == 1) {
-            resultText.textContent = "Player X won!";
+            resultText.textContent = `Player ${game.getPlayer1()} won!`;
         }
         else if(game.board.checkWins() == 2) {
-            resultText.textContent = "Player O won!";
+            resultText.textContent = `Player ${game.getPlayer2()} won`;
         }
         else if(game.board.checkWins() == "tie") {
             resultText.textContent = "It's a tie!";
+        }
+        if(game.getTurnIndex() % 2 == 0) {
+            playerTurn.textContent = game.getPlayer1();
+            console.log(game.getPlayer1())
+        }
+        else if(game.getTurnIndex() % 2 == 1) {
+            playerTurn.textContent = game.getPlayer2();
+            console.log(game.getPlayer1())
         }
     }
 
@@ -163,6 +196,7 @@ function ScreenController() {
     resetButton.addEventListener("click", () => {
         game.resetGame();
         render();
+        resultText.textContent = ""
     })
     return {
         render, 

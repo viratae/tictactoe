@@ -87,3 +87,34 @@ h3 {
 .white {
     color: rgb(254, 255, 251);
 }
+
+/* Forms */
+#playerNameForm {
+    width: 290px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    gap: 5px;
+}
+#playerNameForm > div {
+    display: flex;
+    justify-content: space-between;
+}
+label {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+}
+#submitButton {
+    align-self: flex-end;
+    width: 120px;
+    height: auto;
+    font-size: 16px;
+    padding: 5px 2px;
+    border-radius: 6px;
+    transition: all .3s;
+}
+#submitButton:hover {
+    background-color: #749ad6;
+}

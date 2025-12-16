@@ -15,6 +15,17 @@
 <body>
     <h1>Let's Play</h1>
     <h2><span class="red">Tic</span> <span class="white">Tac</span> <span class="blue">Toe</span></h2>
+    <form id="playerNameForm" autocomplete="off">
+        <div>
+            <label for="player1Name">Player 1 Name:</label>
+            <input id="player1Name" type="text">
+        </div>
+        <div>
+            <label for="player2Name">Player 2 Name:</label>
+            <input id="player2Name" type="text">
+        </div>
+        <button id="submitButton" type="submit">Update Names</button>
+    </form>
     <div id="turnContainer">
         <div id="turn">
             <h3>Turn: <span class="bold" id="playerTurn">X</span></h3>
