@@ -1,43 +1,29 @@
-//Variables
-gameButtons = document.querySelectorAll(".gameButton");
-let player1 = "X";
-let player2 = "O";
-//Factory function that creates a new gameboard
+// =======================================================================
+//     USING CLOSURES, FACTORY FUNCTIONS, AND IIFEs
+// =======================================================================
+
+
+/* Factory Function */
 function gameboard() {
-    let turnIndex = 0;
-    
-    const board = [
-        [0,0,0],
-        [0,0,0],
-        [0,0,0]
-    ];
-    //---Methods we'll use and not return (Private)---
-    
-    //---Methods we'll return (Public)---
-    function reset() {
-        for(i=0; i<=2; i++) {
-            for(j=0; j<=2; j++){
-                board[i][j] = 0;
-            }
+    const rows = 3;
+    const columns = 3;
+
+    const board = [];
+    for(let i = 0; i < rows; i++) {
+        board[i] = [];
+        for(let j = 0; j < columns; j++) {
+            board[i][j] = 0;
         }
     }
-    //return board
-    function getBoard() {
-        return board;
-    }
-    //mark square
-    function mark(row, column, player) {
-        //check if tile already occupied
-        if(board[row][column] == 0){
-            board[row][column] = player;
-        }
-        else {
-            console.log("Spot taken!");
-        }
-        
-    }
+
+    // --- Private Methods --- //
+
+    // --- Public Methods --- //
     function displayBoard() {
         console.log(board);
+    }
+    function getBoard() {
+        return board;
     }
     function checkWins(){
         //---WINS---
@@ -87,16 +73,55 @@ function gameboard() {
         }
             
     }
+    function mark(row, col, marker) {
+        if(board[row][col] == 0) {
+            board[row][col] = marker;
+            return true;
+        }
+        else if(board[row][col] != 0) {
+            console.log("too late!"); 
+            return false;
+        }
+    }
+    function reset() {
+        for(let i = 0; i < rows; i++) {
+        board[i] = [];
+        for(let j = 0; j < columns; j++) {
+            board[i][j] = 0;
+        }
+    }
+    }
     return {
-        turnIndex, getBoard, mark, displayBoard, checkWins, reset
+        displayBoard, 
+        getBoard,
+        checkWins,
+        mark,
+        reset
     };
 }
-function GameController() {
+/* IIFE - Game (previously GameController) */
+const game = (function GameController() {
     const board = gameboard();
-    
-    //---Forms---
-   
+    let turnIndex = 0;
+    let player1 = "x";
+    let player2 = "o";
+    // --- Private Methods --- //
+    function changeTurn() {
+        turnIndex++;
+        
+    }
+    function getTurn() {
+        if((turnIndex % 2) == 0) {
+            return 1;
+        }
+        else if((turnIndex % 2)== 1) {
+            return 2;
+        }
+    }
+
+    // --- Public Methods --- //
     playerNameForm.addEventListener("submit", e => {
+        
         e.preventDefault();
         const playerForm = document.querySelector("playerNameForm");
         const player1Name = document.querySelector("#player1Name").value;
@@ -104,7 +129,6 @@ function GameController() {
 
         player1 = player1Name;
         player2 = player2Name;
-        console.log(player1);
         screen.render();
     })
     function getPlayer1() {
@@ -113,108 +137,111 @@ function GameController() {
     function getPlayer2() {
         return player2;
     }
-
-    let turnIndex = 0;
-    //---Private Method---
-    function chooseToken(turnIndex) {
-        if(turnIndex % 2 == 0) {
-            return 1;
-        }
-        else {
-            return 2;
-        }
+    /* In order to not expose the board, we use a getBoard() function in gameboard()
+    However, in order for ScreenController to access the same board, we must return it again */
+    function getBoard() {
+        return board.getBoard();
     }
-    //---Public Method---
-    function playTurn(row, column) {
-        board.mark(row, column, chooseToken(turnIndex));
-        console.log(board.checkWins());
-        turnIndex +=1;
-        screen.render();
+    function checkWins() {
+        return board.checkWins();
+    }
+    function playTurn(row, col) {
+        if(board.mark(row,col,getTurn())) {
+            changeTurn();
+        }
+        
+    }
+    function displayBoard() {
+        board.displayBoard();
     }
     function resetGame() {
         board.reset();
         turnIndex = 0;
     }
-    function getTurnIndex() {
-        return turnIndex;
-    }
-    return {
-        board, playTurn, resetGame, getPlayer1, getPlayer2, getTurnIndex
+    return { 
+        getPlayer1,
+        getPlayer2,
+        checkWins,
+        getTurn,
+        getBoard,
+        playTurn,
+        displayBoard,
+        resetGame
     };
-}
-function ScreenController() {
-    resultText = document.querySelector("#resultText");
-    playerTurn = document.querySelector("#playerTurn");
+}());
+/* IIFE */
+const screen = (function ScreenController() {
+    const gameButtons = document.querySelectorAll(".gameButton");
+    const resultText = document.querySelector("#resultText");
+    const playerTurn = document.querySelector("#playerTurn");
     gameButtons.forEach(button => {
         button.addEventListener("click", handleClick);
     })
-    
-    function render() {
-        const board = game.board.getBoard();
-        gameButtons.forEach(button => {
-            const row = Number(button.dataset.row);
-            const col = Number(button.dataset.col);
-                
-            const squareValue = board[row][col];
-            if(squareValue == 1) {
-                button.textContent ="x";
-            }
-            else if (squareValue == 2) {
-                button.textContent = "o";
-            }
-            else if(squareValue == 0) {
-                button.textContent="";
-            }
-        });
-        if(game.board.checkWins() == 1) {
-            resultText.textContent = `Player ${game.getPlayer1()} won!`;
-        }
-        else if(game.board.checkWins() == 2) {
-            resultText.textContent = `Player ${game.getPlayer2()} won`;
-        }
-        else if(game.board.checkWins() == "tie") {
-            resultText.textContent = "It's a tie!";
-        }
-        if(game.getTurnIndex() % 2 == 0) {
-            playerTurn.textContent = game.getPlayer1();
-            console.log(game.getPlayer1())
-        }
-        else if(game.getTurnIndex() % 2 == 1) {
-            playerTurn.textContent = game.getPlayer2();
-            console.log(game.getPlayer1())
-        }
-    }
-
     function handleClick(e) {
         const row = Number(e.target.dataset.row);
         const col = Number(e.target.dataset.col);
 
         game.playTurn(row, col);
         render();
+        console.log(game.getBoard());
+    }
+    function disableButtons() {
+        gameButtons.forEach(button => {
+            button.disabled = true;
+        })
+    }
+    function enableButtons() {
+        gameButtons.forEach(button => {
+            button.disabled = false;
+        })
+    }
+    function render() {
+        const board = game.getBoard();
+        gameButtons.forEach(button => {
+            const row = Number(button.dataset.row);
+            const col = Number(button.dataset.col);
+
+            const tileNumber = board[row][col];
+            if(tileNumber == 0) {
+                button.textContent = "";
+            }
+            else if(tileNumber == 1) {
+                button.textContent = "x";
+            }
+            else if(tileNumber == 2) {
+                button.textContent = "o";
+            }
+        })
+        if(game.checkWins() == 1) {
+            resultText.textContent = `Player ${game.getPlayer1()} won!`;
+            disableButtons();
+        }
+        else if(game.checkWins() == 2) {
+            resultText.textContent = `Player ${game.getPlayer2()} won!`;
+            disableButtons();
+        }
+        else if(game.checkWins() == "tie") {
+            resultText.textContent = "It's a tie!";
+            disableButtons();
+        }
+
+        if(game.getTurn() == 1) {
+            playerTurn.textContent = game.getPlayer1();
+            console.log(game.getPlayer1())
+        }
+        else if(game.getTurn() == 2) {
+            playerTurn.textContent = game.getPlayer2();
+            console.log(game.getPlayer1())
+        }
     }
     const resetButton = document.querySelector("#resetButton");
     resetButton.addEventListener("click", () => {
         game.resetGame();
         render();
-        resultText.textContent = ""
+        resultText.textContent = "";
+        enableButtons();
     })
     return {
-        render, 
-    };
-      
-}
-const game = GameController();
-const screen = ScreenController();
-// game.playTurn(0,0);
-// game.playTurn(0,2);
-// game.playTurn(0,1)
-// game.playTurn(1,0)
-// game.playTurn(1,2)
-// game.playTurn(1,1)
-// game.playTurn(2,0)
-// game.playTurn(2,2)
-// game.playTurn(2,1)
-
-
-
-game.board.displayBoard();
+        render
+    }
+}());
